@@ -1,99 +1,96 @@
 <html>
-<head>
-    <link href="./style.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lit-access-control-conditions-modal-vanilla-js/dist/main.css" />
-    <script src="https://cdn.jsdelivr.net/npm/lit-access-control-conditions-modal-vanilla-js/dist/index.js"></script>
-</head>
-<body>
+    <head>
+        <link href="./style.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lit-access-control-conditions-modal-vanilla-js/dist/main.css" />
+        <script src="https://cdn.jsdelivr.net/npm/lit-access-control-conditions-modal-vanilla-js/dist/index.js"></script>
+    </head>
+    <body>
+        <h1>Lit-Protocol SDK Test</h1><br>
 
-    <!-- ========== HTML ========== -->
-    <h1>Lit-Protocol SDK Test</h1><br>
+        <div id="shareModal"></div>
 
-    <div id="shareModal"></div>
+        <div class="logic-flow">
 
-    <div class="logic-flow">
+            <!-- ---------- Creator:: Logic Flow ---------- -->
+            <div class="settings">
+                <h2>Creator</h2><br>
+        
+                <!-- ---------- Get video ID ---------- -->
+                <br> 1. Paste your CloudFlare video_id:
+                <div class="settings__row">
+                    <input id="cf_video_id" type="text" value="e43e6ed536db175ffc00b8d0f1e7c92e">
+                </div>
+        
+                <!-- ---------- Access Control ---------- -->
+                <br> 2. Set accessControlConditions for this video_id
+                <div class="settings__row">
+                    <button onclick="setAccessControlConditions()">Set Access Control Conditions</button>
+                </div>
 
-        <!-- ---------- Creator:: Logic Flow ---------- -->
-        <div class="settings">
-            <h2>Creator</h2><br>
-    
-            <!-- ---------- Get video ID ---------- -->
-            <br> 1. Paste your CloudFlare video_id:
-            <div class="settings__row">
-                <input id="cf_video_id" type="text" value="e43e6ed536db175ffc00b8d0f1e7c92e">
+                <!-- ---------- Generate Snippet ---------- -->
+                <pre id="result_generateSnippet"></pre>
+                <button onclick="copy()">Copy</button>
+
             </div>
-    
-            <!-- ---------- Access Control ---------- -->
-            <br> 2. Set accessControlConditions for this video_id
-            <div class="settings__row">
-                <button onclick="setAccessControlConditions()">Set Access Control Conditions</button>
-            </div>
-
-            <!-- ---------- Generate Snippet ---------- -->
-            <pre id="result_generateSnippet"></pre>
-
         </div>
-    </div>
+        
+        <!-- ========== LIT-PROTOCOL ========== -->
+        <script>
 
-    <!-- ========== ...HTML ENDS ========== -->
+            // ----- Methods -----
+            // 
+            // Set & Save the access control conditions to local storage
+            // @returns { Void }
+            //
+            async function setAccessControlConditions(){
 
-    <!-- ========== LIT-PROTOCOL ========== -->
-    <script>
+                // -- prepare params
+                const chain = 'ethereum';
+                const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
+                openShareModal();
+            }
 
-        // ----- Methods -----
-        // 
-        // Set & Save the access control conditions to local storage
-        // @returns { Void }
-        //
-        async function setAccessControlConditions(){
+            //
+            // encrypt video id
+            //
+            async function encryptVideoId(){
+                
+                // -- prepare params
+                const chain = 'ethereum';
 
-            // -- prepare params
-            const chain = 'ethereum';
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
-            openShareModal();
-        }
+                const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
 
-        //
-        // encrypt video id
-        //
-        async function encryptVideoId(){
-            
-            // -- prepare params
-            const chain = 'ethereum';
+                const accessControlConditions = JSON.parse(atob(localStorage['accessControlConditions']));
 
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
+                const videoId = document.getElementById('cf_video_id').value;
 
-            const accessControlConditions = JSON.parse(atob(localStorage['accessControlConditions']));
+                const { encryptedZip, symmetricKey } = await LitJsSdk.zipAndEncryptString(videoId);
 
-            const videoId = document.getElementById('cf_video_id').value;
+                const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
+                    accessControlConditions, // array of objects [{}]
+                    symmetricKey, // Unit8Array string
+                    authSig, // object
+                    chain, // string
+                });
 
-            const { encryptedZip, symmetricKey } = await LitJsSdk.zipAndEncryptString(videoId);
+                const encryptedSymmetricKey_string = btoa(encryptedSymmetricKey);
 
-            const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
-                accessControlConditions, // array of objects [{}]
-                symmetricKey, // Unit8Array string
-                authSig, // object
-                chain, // string
-            });
+                const encryptedZip_dataURI = await blobToDataURI(encryptedZip);
 
-            const encryptedSymmetricKey_string = btoa(encryptedSymmetricKey);
+                localStorage['data-lit'] = btoa(JSON.stringify({
+                    accessControlConditions: localStorage['accessControlConditions'],
+                    encryptedZip:  encryptedZip_dataURI,
+                    encryptedSymmetricKey: btoa(encryptedSymmetricKey),
+                }));
+                localStorage.removeItem('accessControlConditions');
+            }
 
-            const encryptedZip_dataURI = await blobToDataURI(encryptedZip);
+            //
+            // Creator:: Generate Snippet
+            //
+            async function generateSnippet(){
 
-            localStorage['data-lit'] = btoa(JSON.stringify({
-                accessControlConditions: localStorage['accessControlConditions'],
-                encryptedZip:  encryptedZip_dataURI,
-                encryptedSymmetricKey: btoa(encryptedSymmetricKey),
-            }));
-            localStorage.removeItem('accessControlConditions');
-        }
-
-        //
-        // Creator:: Generate Snippet
-        //
-        async function generateSnippet(){
-
-            document.getElementById('result_generateSnippet').innerText = `<div class="lit-video-wrapper">
+                document.getElementById('result_generateSnippet').innerText = `<div class="lit-video-wrapper">
     <iframe 
         src=""
         class="lit-video"
@@ -106,79 +103,84 @@
     <button class="btn-lit-video-unlock">Unlock</button>
 </div>`
 
-        }
+            }
 
-        
-        // ----- Helper -----
-        // 
-        // turn blob data to data URI
-        // @param { Blob } blob 
-        // @return { Promise<String> } blob data in data URI
-        // 
-        async function blobToDataURI(blob){
-            return new Promise((resolve, reject) => {
-                var reader = new FileReader();
+            
+            // ----- Helper -----
+            // 
+            // turn blob data to data URI
+            // @param { Blob } blob 
+            // @return { Promise<String> } blob data in data URI
+            // 
+            async function blobToDataURI(blob){
+                return new Promise((resolve, reject) => {
+                    var reader = new FileReader();
 
-                reader.onload = (e) => {
-                    var data = e.target.result;
-                    resolve(data);
-                };
-                reader.readAsDataURL(blob);
-            });
-        }
-        
-        // 
-        // Open Access Controls model
-        //
-        function openShareModal() {
-            console.log("open share modal");
-            ACCM.ReactContentRenderer.render(
-            ACCM.ShareModal,
-            // props to be passed to the ShareModal component.  These are documented here: https://github.com/LIT-Protocol/lit-access-control-conditions-modal#props
-            {
-                sharingItems: [],
-                onAccessControlConditionsSelected: async function (accessControlConditions) {
-                    console.log(
-                        "accessControlConditions from ShareModal: ",
-                        accessControlConditions
-                    );
-                    localStorage['accessControlConditions'] = btoa(JSON.stringify(accessControlConditions));
-                    ACCM.ReactContentRenderer.unmount(document.getElementById("shareModal"));
-                    await encryptVideoId();
-                    await generateSnippet();
+                    reader.onload = (e) => {
+                        var data = e.target.result;
+                        resolve(data);
+                    };
+                    reader.readAsDataURL(blob);
+                });
+            }
+
+            function copy() {
+                var copyText = document.getElementById("result_generateSnippet");
+                navigator.clipboard.writeText(copyText.innerText);
+            }
+            
+            // 
+            // Open Access Controls model
+            //
+            function openShareModal() {
+                console.log("open share modal");
+                ACCM.ReactContentRenderer.render(
+                ACCM.ShareModal,
+                // props to be passed to the ShareModal component.  These are documented here: https://github.com/LIT-Protocol/lit-access-control-conditions-modal#props
+                {
+                    sharingItems: [],
+                    onAccessControlConditionsSelected: async function (accessControlConditions) {
+                        console.log(
+                            "accessControlConditions from ShareModal: ",
+                            accessControlConditions
+                        );
+                        localStorage['accessControlConditions'] = btoa(JSON.stringify(accessControlConditions));
+                        ACCM.ReactContentRenderer.unmount(document.getElementById("shareModal"));
+                        await encryptVideoId();
+                        await generateSnippet();
+                    },
+                    onClose: () => {
+                        console.log("close share modal"), ACCM.ReactContentRenderer.unmount(document.getElementById("shareModal"));
+                    },
+                    getSharingLink: function (sharingItem) {
+                        console.log("getSharingLink", sharingItem);
+                        return "";
+                    },
+                    showStep: "ableToAccess",
                 },
-                onClose: () => {
-                    console.log("close share modal"), ACCM.ReactContentRenderer.unmount(document.getElementById("shareModal"));
-                },
-                getSharingLink: function (sharingItem) {
-                    console.log("getSharingLink", sharingItem);
-                    return "";
-                },
-                showStep: "ableToAccess",
-            },
-            // target DOM node
-            document.getElementById("shareModal")
-            );
-        }
+                // target DOM node
+                document.getElementById("shareModal")
+                );
+            }
 
-        // ----- Main (Load Lit-Protocol SDK) -----
-        async function litJsSdkLoaded(){
+            // ----- Main (Load Lit-Protocol SDK) -----
+            async function litJsSdkLoaded(){
 
-            // connent to Lit Node Client
-            var litNodeClient = new LitJsSdk.LitNodeClient()
-            litNodeClient.connect()
-            window.litNodeClient = litNodeClient
+                // connent to Lit Node Client
+                var litNodeClient = new LitJsSdk.LitNodeClient()
+                litNodeClient.connect()
+                window.litNodeClient = litNodeClient
 
-            // listen when the network is fully connected:
-            document.addEventListener('lit-ready', async function (e) {
-                console.log('🔥 LIT network is ready')
-                window.networkLoading = true;
-            }, false);
-        }
+                // listen when the network is fully connected:
+                document.addEventListener('lit-ready', async function (e) {
+                    console.log('🔥 LIT network is ready')
+                    window.networkLoading = true;
+                }, false);
+            }
 
-    </script>
+        </script>
 
-    <script onload='litJsSdkLoaded()' src="https://jscdn.litgateway.com/index.web.js"></script>
-    <script src="./lit-access-control-conditions-modal-vanilla-js/dist/index.js"></script>    
-</body>
+        <script onload='litJsSdkLoaded()' src="https://jscdn.litgateway.com/index.web.js"></script>
+        <script src="./lit-access-control-conditions-modal-vanilla-js/dist/index.js"></script>    
+    </body>
 </html>

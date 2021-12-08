@@ -43,7 +43,7 @@ pre#result_generateSnippet {
     width: 100%;
     overflow: auto;
     background: white;
-    border: 1px solid grey;
+    /* border: 1px solid grey; */
     border-radius: 5px;
     margin-left: 4px;
 }
