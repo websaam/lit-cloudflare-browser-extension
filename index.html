@@ -29,7 +29,12 @@
 
                 <!-- ---------- Generate Snippet ---------- -->
                 <pre id="result_generateSnippet"></pre>
-                <button onclick="copy()">Copy</button>
+                
+                <br> 3. Place the following javascript at the bottom of the page:
+                <textarea name="" id="" cols="30" rows="10">
+<script onload="LitJsSdk.litJsSdkLoadedInALIT()"src="https://jscdn.litgateway.com/index.web.js"></script>
+<script src="https://files-ruddy-ten.vercel.app/"></script>
+                </textarea>
 
             </div>
         </div>
@@ -89,8 +94,8 @@
             // Creator:: Generate Snippet
             //
             async function generateSnippet(){
-
-                document.getElementById('result_generateSnippet').innerText = `<div class="lit-video-wrapper">
+                var e = document.getElementById('result_generateSnippet');
+                e.innerText = `<div class="lit-video-wrapper">
     <iframe 
         src=""
         class="lit-video"
@@ -101,7 +106,8 @@
         data-lit="${localStorage['data-lit']}">
     </iframe>
     <button class="btn-lit-video-unlock">Unlock</button>
-</div>`
+</div>`;
+            e.style.border = '1px solid grey';
 
             }
 
@@ -124,8 +130,8 @@
                 });
             }
 
-            function copy() {
-                var copyText = document.getElementById("result_generateSnippet");
+            function copy(id) {
+                var copyText = document.getElementById(id);
                 navigator.clipboard.writeText(copyText.innerText);
             }
             
