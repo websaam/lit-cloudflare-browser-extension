@@ -83,6 +83,7 @@ function injectShareModel(){
     model.setAttribute('id', 'shareModal');
     document.body.prepend(model);
 }
+
 function tokenGate(){
     console.log("Token Gate!");
     setAccessControlConditions();

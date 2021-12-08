@@ -23,6 +23,13 @@ function openShareModal() {
                 accessControlConditions
             );
             localStorage['accessControlConditions'] = btoa(JSON.stringify(accessControlConditions));
+
+            const readableConditions = await LitJsSdk.humanizeAccessControlConditions({
+                accessControlConditions,
+            });
+
+            localStorage['readableConditions'] = readableConditions;
+
             ACCM.ReactContentRenderer.unmount(document.getElementById("shareModal"));
             await encryptVideoId();
             await generateSnippet();
@@ -85,6 +92,7 @@ async function generateSnippet(){
         autoplay; encrypted-media; 
         picture-in-picture;" 
         allowfullscreen="true"
+        data-readable-conditions="${localStorage['readableConditions']}"
         data-lit="${localStorage['data-lit']}">
     </iframe>
     <button class="btn-lit-video-unlock">Unlock</button>
