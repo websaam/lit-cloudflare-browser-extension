@@ -1,0 +1,29 @@
+{
+    "manifest_version": 2,
+    "name": "Lit-CloudFlare",
+    "description" : "Lit-CloudFlare",
+    "version" : "0.0.1",
+    "background": {"scripts": ["reload.js"]},
+    "content_scripts": [ {
+        "matches": [
+            "https://dash.cloudflare.com/", 
+            "https://dash.cloudflare.com/*"
+        ],
+        "css": [
+            "style.css",
+            "vendors/lit-access-control-conditions-modal-vanilla-js/main.css"
+        ],
+        "js": [
+            "utils.js",
+            "vendors/jscdn.litgateway.com/index.web.js",
+            "vendors/lit-access-control-conditions-modal-vanilla-js/index.js",
+            "main.js",
+            "gate.js"
+        ]
+    } ],
+    "icons": {"128": "icon.png"},
+    "browser_action" : {
+        "default_popup": "popup.html",
+        "default_icon": "icon.png"
+    }
+}
