@@ -1,0 +1,49 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    padding: 12px;
+    font-size: 12px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.logic-flow{
+    display: grid;
+    grid-template-columns: 1fr;
+}
+.settings{
+    max-width: 500px;
+    background-color: #f9f9f9;
+    padding: 12px;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    border: 1px solid #ebe9e9;
+    border-radius: 5px;
+}
+fieldset{
+    padding: 12px;
+    display: grid;
+}
+.settings__row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 4px 0;
+}
+.settings__save{
+    margin-left: auto;
+    padding-top: 4px;
+}
+button, input{
+    min-height: 24px;
+    max-height: 48px;
+}
+pre#result_generateSnippet {
+    width: 100%;
+    overflow: auto;
+    background: white;
+    border: 1px solid grey;
+    border-radius: 5px;
+    margin-left: 4px;
+}

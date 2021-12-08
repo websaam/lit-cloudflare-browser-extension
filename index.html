@@ -1,809 +1,115 @@
 <html>
 <head>
-    <style>
-        *{
-            margin: 0;
-            padding: 0;
-        }
-        body{
-            padding: 12px;
-            font-size: 12px;
-            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-        }
-        .logic-flow{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-        .settings{
-            max-width: 500px;
-            background-color: #f9f9f9;
-            padding: 12px;
-            box-sizing: border-box;
-            margin-left: auto;
-            margin-right: auto;
-            width: 100%;
-            border: 1px solid #ebe9e9;
-            border-radius: 5px;
-        }
-        fieldset{
-            padding: 12px;
-            display: grid;
-        }
-        .settings__row{
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            padding: 4px 0;
-        }
-        .settings__save{
-            margin-left: auto;
-            padding-top: 4px;
-        }
-        button, input{
-            min-height: 24px;
-            max-height: 48px;
-        }
-        pre#result_generateSnippet {
-            width: 100%;
-            overflow: auto;
-            background: white;
-            border: 1px solid grey;
-            border-radius: 5px;
-            margin-left: 4px;
-        }
-
-    </style>
+    <link href="./style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lit-access-control-conditions-modal-vanilla-js/dist/main.css" />
+    <script src="https://cdn.jsdelivr.net/npm/lit-access-control-conditions-modal-vanilla-js/dist/index.js"></script>
 </head>
 <body>
 
     <!-- ========== HTML ========== -->
     <h1>Lit-Protocol SDK Test</h1><br>
 
+    <div id="shareModal"></div>
+
     <div class="logic-flow">
 
         <!-- ---------- Creator:: Logic Flow ---------- -->
         <div class="settings">
             <h2>Creator</h2><br>
-
-            <!-- ---------- CloudFlare Settings ---------- -->
-            <fieldset>
-                <legend>CloudFlare Settings</legend>
-                <div class="settings__row">
-                    <p>Username</p>
-                    <input id="cf_username" type="text" value="lightanson@protonmail.com">
-                </div>
-                <div class="settings__row">
-                    <p>Global API</p>
-                    <input id="cf_global_api" type="text" value="9e71cdc773da780e5059efe41ee0887d86b08">
-                </div>
-                <div class="settings__row">
-                    <p>Account ID</p>
-                    <input id="cf_account_id" type="text" value="9b47beba2f167662ac16b81572ee529d">
-                </div>
-                <div class="settings__save">
-                    <button onclick="saveConfig()">Save to Local Storage</button>
-                </div>
-                <!-- <button onClick="requestCloudflareVideoJWT(val('cf_account_id'),val('cf_video_id')
-                )">Request Cloudflare Video JWT</button> | 
-                <button onClick="requestCloudflareVideoJSON(val('cf_account_id'),val('cf_video_id')
-                )">Request Cloudflare Video JSON</button> -->
-    
-            </fieldset>
     
             <!-- ---------- Get video ID ---------- -->
-            <br> 1. Paste your video_id:
+            <br> 1. Paste your CloudFlare video_id:
             <div class="settings__row">
-                <p>Video ID</p>
-                <input id="cf_video_id" type="text" value="" placeholder="...generating random path"/>
-                <!-- <input id="cf_video_id" type="text" value="e43e6ed536db175ffc00b8d0f1e7c92e"> -->
+                <input id="cf_video_id" type="text" value="e43e6ed536db175ffc00b8d0f1e7c92e">
             </div>
     
             <!-- ---------- Access Control ---------- -->
             <br> 2. Set accessControlConditions for this video_id
             <div class="settings__row">
-                <button onclick="setAccessControlConditions()">(void) setAccessControlConditions()</button>
-                <p id="result_setAccessControlConditions" style="padding-left: 12px;"></p>
-            </div>
-    
-            <!-- ---------- Provision Access ---------- -->
-            <br> 3. Provision access to the video_id using the accessControlConditions 
-    
-            <div class="settings__row">
-                <button onClick="provisionAccess(val('cf_video_id'));">(void) provisionAccess(video_id);</button>
-                <p id="result_provisionAccess" style="padding-left: 12px;"></p>
-            </div>
-    
-            <!-- ---------- Encrypt Video ID ---------- -->
-            <br> 4. encrypt video_id
-            <div class="settings__row">
-                <button onclick="encryptVideoId()">(void) encryptVideoId()</button>
-                <p id="result_encryptVideoId" style="padding-left: 12px;"></p>
+                <button onclick="setAccessControlConditions()">Set Access Control Conditions</button>
             </div>
 
             <!-- ---------- Generate Snippet ---------- -->
-            <br> 5. Generate Snippet to copy/paste
-            <div class="settings__row">
-                <button onclick="generateSnippet()">(void) generateSnippet()</button>
-                <pre id="result_generateSnippet"></pre>
-            </div>
-        
-            <!-- <div class="settings__row">
-                <button onClick="requestJWT();">Request JWT from Lit-Protocol</button>
-            </div>
-    
-            <div class="settings__row">
-                <button onClick="verifyJWT();">Verify JWT</button>
-            </div> -->
-    
-        </div>
-        <!-- ... end: Creator:: Logic Flow -->
-
-
-        <!-- User:: Logic Flow -->
-        <div class="settings">
-            <h2>User</h2><br>
-
-            <br> 2. Get the decryptedSymmetricKey:
-            <div class="settings__row">
-                <button onclick="getDecryptedSymmetricKey()">(Unit8Array) getDecryptedSymmetricKey()</button>
-                <p id="result_getDecryptedSymmetricKey" style="padding-left: 12px;"></p>
-            </div>
+            <pre id="result_generateSnippet"></pre>
 
         </div>
-        <!-- ...end User:: Logic FLow -->
-
     </div>
-
-
-
-
-
 
     <!-- ========== ...HTML ENDS ========== -->
 
     <!-- ========== LIT-PROTOCOL ========== -->
     <script>
 
-        // global variables
-        networkLoading = false;
-
-        // variables to be saved to decrypt data
-        var global_accessControlConditions;
-        
-        function setNetworkLoading(state){
-            networkLoading = state;
-        }
-        
-        async function setEncryptedSymmetricKey(){
-
-            // -- Validate
-            if(!networkLoading){
-                console.log("Network is not ready");
-                return;
-            };
-
-            // -- setup params
-            var toBeEncrypted = 'Hello, World.';
-            var selectedChain = 'ethereum';
-
-            // Prepare access control conditions where a user will be allowed to decrypt.
-            var selectedAccessControlConditions = [
-                {
-                    "contractAddress": LitJsSdk.LIT_CHAINS[selectedChain].contractAddress,
-                    "standardContractType": "",
-                    "chain": selectedChain,
-                    "method": "",
-                    "parameters": [
-                        ":userAddress"
-                    ],
-                    "returnValueTest": {
-                        "comparator": "=",
-                        "value": "0xdCA42aC41e79db20995a84DE2cE2368519bcB4d0"
-                    }
-                }
-            ];
-
-            // -- run
-            // request a signature
-            // authSig: Object
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: selectedChain});
-
-            // start encryption
-            // encryptedZip: Blob
-            // symmetricKey: Unit8Array
-            const { encryptedZip, symmetricKey } = await LitJsSdk.zipAndEncryptString(toBeEncrypted);
-
-            // encryptedSymmetricKey: Unit8Array
-            const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
-                accessControlConditions: selectedAccessControlConditions, // array of objects [{}]
-                symmetricKey: symmetricKey, // Unit8Array string
-                authSig, // object
-                chain: selectedChain, // string
-            });
-
-            // save 
-            // 1. accessControlConditions <-- key needed to get the encryption key to verify if user is authorized 
-            // 2. encryptedSymmetricKey <-- key needed to get the encryption key to verify if user is authorized
-            // 3. encryptedZip <-- value to be decrypted/unlocked
-            // 4. symmetricKey <-- key needed to decrypt the encryptedZip/data
-            global_accessControlConditions = selectedAccessControlConditions;
-            
-            var encryptedZipBlobDataURI = await blobToDataURI(encryptedZip);
-            console.log("Your converted blob: ", encryptedZipBlobDataURI);
-            localStorage['encryptedZip'] = encryptedZipBlobDataURI;
-            localStorage['encryptedSymmetricKey'] = encryptedSymmetricKey;
-
-            document.getElementById('gstate').innerHTML = `accessControlConditions = ${JSON.stringify(global_accessControlConditions)}<br>encryptedSymmetricKey = ${JSON.stringify(encryptedSymmetricKey)}`
-        
-        }
-
-        // Step 2
-        async function getEncryptionKeyAndDecryptData(){
-
-            // -- Validate
-            if(!networkLoading){
-                console.log("Network is not ready");
-                return;
-            };
-
-            // -- setup params
-            var selectedChain = 'ethereum';
-
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'ethereum'});
-            
-            // !DOC NOTE
-            // this section checks if user is authorized/met the access control conditions
-            // It should be wrapped inside a try/catch statement
-            let symmKey;
-
-            try{
-                // present the following to obtain decrypted symmetric key, to decrypt the zip
-                // 1. accessControlConditions
-                // 2. encryptedSymmetricKey
-                const unit8ArrayEncryptedSymmetricKey = new Uint8Array((localStorage.getItem('encryptedSymmetricKey')).split(',').map((x) => parseInt(x)));
-
-                symmKey = await window.litNodeClient.getEncryptionKey({
-                    accessControlConditions: global_accessControlConditions,
-                    toDecrypt: buf2hex(unit8ArrayEncryptedSymmetricKey),
-                    chain: selectedChain,
-                    authSig
-                });
-
-                const encryptedZipBlob = dataURItoBlob(localStorage.getItem('encryptedZip'));
-
-                var decryptedString = await getDecryptedString(encryptedZipBlob, symmKey);
-
-                console.log("✅ Requested Authorized.");
-                console.log("Decrypted String: ", decryptedString);
-                return decryptedString;
-                
-            }catch(e){
-                console.error("NOT AUTHORIZED.");
-                return null;
-            }
-        }
-
-        async function dynamicContent(){
-            console.log("dynamicContent");
-            // const jwt = "eyJhbGciOiJCTFMxMi0zODEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJMSVQiLCJzdWIiOiIweGRiZDM2MGYzMDA5N2ZiNmQ5MzhkY2M4YjdiNjI4NTRiMzYxNjBiNDUiLCJjaGFpbiI6ImZhbnRvbSIsImlhdCI6MTYyODAzMTM1OCwiZXhwIjoxNjI4MDc0NTU4LCJiYXNlVXJsIjoiaHR0cHM6Ly9teS1keW5hbWljLWNvbnRlbnQtc2VydmVyLmNvbSIsInBhdGgiOiIvYV9wYXRoLmh0bWwiLCJvcmdJZCI6IiJ9.lX_aBSgGVYWd2FL6elRHoPJ2nab0IkmmX600cwZPCyK_SazZ-pzBUGDDQ0clthPVAtoS7roHg14xpEJlcSJUZBA7VTlPiDCOrkie_Hmulj765qS44t3kxAYduLhNQ-VN"
-            // const { verified, header, payload } = LitJsSdk.verifyJwt({jwt})
-            // console.log(verified);
-            // console.log(header);
-            // console.log(payload);
-            // if (payload.baseUrl !== "this-website.com" || payload.path !== "/path-you-expected" || payload.orgId !== "" || payload.role !== "" || payload.extraData !== "") {
-            //     // Reject this request!
-            //     console.log("Reject this request!");
-            //     return false
-            // }
-
-            const chain = 'ethereum';
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain})
-    
-            // --- provisional
-            const accessControlConditions = [
-                {
-                    "contractAddress": LitJsSdk.LIT_CHAINS[chain].contractAddress,
-                    "standardContractType": "",
-                    "chain": chain,
-                    "method": "",
-                    "parameters": [
-                        ":userAddress"
-                    ],
-                    "returnValueTest": {
-                        "comparator": "=",
-                        "value": "0xdCA42aC41e79db20995a84DE2cE2368519bcB4d0"
-                    }
-                }
-            ];
-
-            const resourceId = {
-                baseUrl: '127.0.0.1:5500',
-                path: '/index.html',
-                orgId: "",
-                role: "",
-                extraData: ""
-            }
-
-            // // !DOC NOTE only works first time
-            // await litNodeClient.saveSigningCondition({ accessControlConditions, chain, authSig, resourceId });
-
-            // --- access a resource via JWT
-            const jwt = await litNodeClient.getSignedToken({ accessControlConditions, chain, authSig, resourceId });
-
-            // eyJhbGciOiJCTFMxMi0zODEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJMSVQiLCJzdWIiOiIweGRjYTQyYWM0MWU3OWRiMjA5OTVhODRkZTJjZTIzNjg1MTliY2I0ZDAiLCJjaGFpbiI6ImV0aGVyZXVtIiwiaWF0IjoxNjM4NzM2MzUwLCJleHAiOjE2Mzg3Nzk1NTAsImJhc2VVcmwiOiIxMjcuMC4wLjE6NTUwMCIsInBhdGgiOiIvaW5kZXguaHRtbCIsIm9yZ0lkIjoiIiwicm9sZSI6IiIsImV4dHJhRGF0YSI6IiJ9.q_26mUCrZVl627YpPMLf9T0VtMqlWiK8j-wVRnUnp4-9QdxKJUy6l_gXeeW9Hc29C9D2FvXhZQPHhay-AKe0lmxHB73_16s9KWmqZELZu6-kBI89iNt-Oj3q2fcWtqul
-            
-            console.log(jwt);
-
-            const { verified, header, payload } = LitJsSdk.verifyJwt({jwt})
-            console.log("Verified:", verified);
-            console.log("Header:", header);
-            console.log("Payload:", payload);
-            
-        }
-
         // ----- Methods -----
-        //
-        // Get decrypted string
-        // @param { Blob } encryptedZipBlob
-        // @param { Unit8Array } unit8arraySymmetricKey
-        // @return { String } decrypted string
-        async function getDecryptedString(encryptedZipBlob, unit8arraySymmetricKey){
-            const decryptedFiles = await LitJsSdk.decryptZip(encryptedZipBlob, unit8arraySymmetricKey);
-            const decryptedString = await decryptedFiles["string.txt"].async("text");
-            return decryptedString;
-        }
-
         // 
         // Set & Save the access control conditions to local storage
         // @returns { Void }
         //
         async function setAccessControlConditions(){
 
-            // -- helper
-            var ms = 0;
-            _log = (msg, clear = false) => {
-                var e = document.getElementById('result_setAccessControlConditions');
-                if(clear){
-                    e.innerText = '';
-                    return;
-                }
-                e.innerText += msg + '\n';
-            }
-            _log('', true);
-
             // -- prepare params
-            _log('1. Select "ethereum" chain');
-            const chain = 'ethereum';
-            await sleep(ms);
-
-            _log('2. Check & signing auth message"');
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
-            await sleep(ms);
-
-            _log('3. Set accessControlConditions');
-            const accessControlConditions = [
-                {
-                    "contractAddress": LitJsSdk.LIT_CHAINS[chain].contractAddress,
-                    "standardContractType": "",
-                    "chain": chain,
-                    "method": "",
-                    "parameters": [
-                        ":userAddress"
-                    ],
-                    "returnValueTest": {
-                        "comparator": "=",
-                        "value": "0xdCA42aC41e79db20995a84DE2cE2368519bcB4d0"
-                    }
-                }
-            ];
-            await sleep(ms);
-
-            _log('4. Save accessControlConditions to localStorage');
-            localStorage['accessControlConditions'] = btoa(JSON.stringify(accessControlConditions));
-            await sleep(ms);
-
-            _log('5. Done - Check your localStorage');
-
-        }
-
-        //
-        // Provision Access
-        // @params { String } videoId
-        // @returns { Void }
-        //
-        async function provisionAccess(videoId){
-            
-            // -- helper
-            var ms = 0;
-            _log = (msg, clear = false) => {
-                var e = document.getElementById('result_provisionAccess');
-                if(clear){
-                    e.innerText = '';
-                    return;
-                }
-                e.innerText += msg + '\n';
-            }
-            _log('', true);
-
-            // -- prepare params
-            _log('1. Check & signing auth message');
             const chain = 'ethereum';
             const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
-            await sleep(ms);
-
-            _log('2. Get the accessControlConditions from localStorage');
-            const accessControlConditions = JSON.parse(atob(localStorage['accessControlConditions']));
-            console.log(accessControlConditions);
-            await sleep(ms);
-
-
-            _log('3. Set your resourceId');
-            var cfJwt = await requestCloudflareVideoJWT(val('cf_account_id'), videoId);
-            localStorage['cf_jwt'] = cfJwt;
-            
-            const resourceId = {
-                baseUrl: 'iframe.videodelivery.net',
-                path: '/' + cfJwt,
-                orgId: "",
-                role: "",
-                extraData: ""
-            }
-            console.log(resourceId);
-            await sleep(ms);
-            
-            _log('4. Save & sign conditions to the network');
-            await litNodeClient.saveSigningCondition({
-                accessControlConditions,
-                chain,
-                authSig,
-                resourceId
-            });
-            await sleep(ms);
-
-            _log('5. Done.');
-
+            openShareModal();
         }
 
         //
         // encrypt video id
         //
         async function encryptVideoId(){
-            // -- helper
-            var ms = 0;
-            _log = (msg, clear = false) => {
-                var e = document.getElementById('result_encryptVideoId');
-                if(clear){
-                    e.innerText = '';
-                    return;
-                }
-                e.innerText += msg + '\n';
-            }
-            _log('', true);
             
             // -- prepare params
-            _log('1. Check & signing auth message');
             const chain = 'ethereum';
+
             const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
-            await sleep(ms);
 
-            _log('2. Get the accessControlConditions from localStorage');
             const accessControlConditions = JSON.parse(atob(localStorage['accessControlConditions']));
-            console.log("2. accessControlConditions: ", accessControlConditions);
-            await sleep(ms);
 
-            const videoId = localStorage['cf_jwt'];
-            _log('3. Encrypting video ID: ' + val('cf_video_id'));
+            const videoId = document.getElementById('cf_video_id').value;
+
             const { encryptedZip, symmetricKey } = await LitJsSdk.zipAndEncryptString(videoId);
-            await sleep(ms);
 
-            _log('4. Now we have \n-- a. encryptedZip(Blob) \n-- b. symmetricKey(Unit8Array) ');
-            console.log("4. encryptedZip: ", encryptedZip);
-            console.log("4. symmetricKey: ", symmetricKey);
-            await sleep(ms);
-
-            _log('5. Save & Get the EncryptedSymmetricKey');
             const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
                 accessControlConditions, // array of objects [{}]
                 symmetricKey, // Unit8Array string
                 authSig, // object
                 chain, // string
             });
-            console.log("5. encryptedSymmetricKey: ", encryptedSymmetricKey);
-            await sleep(ms);
 
-            _log('7. Store encryptedSymmetricKey(Unit8Array) as base64 string');
             const encryptedSymmetricKey_string = btoa(encryptedSymmetricKey);
-            console.log("7. encryptedSymmetricKey_string: ", encryptedSymmetricKey_string);
-            localStorage['encryptedSymmetricKey'] = encryptedSymmetricKey_string;
-            await sleep(ms);
 
-            _log('8. Store encryptedZip(Blob) as dataURI(String)');
             const encryptedZip_dataURI = await blobToDataURI(encryptedZip);
-            console.log("8. encryptedZip_dataURI: ", encryptedZip_dataURI);
-            localStorage['encryptedZip'] = encryptedZip_dataURI;
-            await sleep(ms);
+
+            localStorage['data-lit'] = btoa(JSON.stringify({
+                accessControlConditions: localStorage['accessControlConditions'],
+                encryptedZip:  encryptedZip_dataURI,
+                encryptedSymmetricKey: btoa(encryptedSymmetricKey),
+            }));
+            localStorage.removeItem('accessControlConditions');
         }
 
         //
         // Creator:: Generate Snippet
         //
         async function generateSnippet(){
-            var container = document.getElementById('result_generateSnippet');
 
-            container.innerText = `<iframe 
-    src=""
-    id="test"
-    allow="accelerometer; gyroscope; 
-    autoplay; encrypted-media; 
-    picture-in-picture;" 
-    allowfullscreen="true"
-    data-access-control-conditions="${localStorage['accessControlConditions']}"
-    data-encrypted-zip="${localStorage['encryptedZip']}"
-    data-encrypted-symmetric-key="${localStorage['encryptedSymmetricKey']}">
-</iframe>`
-        }
-
-        //
-        // User:: Get decrypted symmetric key
-        //
-        async function getDecryptedSymmetricKey(){
-            // -- helper
-            var ms = 0;
-            _log = (msg, clear = false) => {
-                var e = document.getElementById('result_getDecryptedSymmetricKey');
-                if(clear){
-                    e.innerText = '';
-                    return;
-                }
-                e.innerText += msg + '\n';
-            }
-            _log('', true);
-
-            _log('1. Check & signing auth message');
-            const chain = 'ethereum';
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
-            await sleep(ms);
-
-            _log('2. Get accessControlConditions from localStorage');
-            const accessControlConditions = JSON.parse(atob(localStorage['accessControlConditions']));
-            console.log("2. accessControlConditions: ", accessControlConditions);
-            await sleep(ms);
-
-            _log("3. Get encryptedSymmetricKey base64 string from localStorage");
-            const encryptedSymmetricKey_base64 = localStorage['encryptedSymmetricKey'];
-            console.log("3. encryptedSymmetricKey_base64: ", encryptedSymmetricKey_base64);
-            await sleep(ms);
-
-            _log("4. Turn it into Unit8Array");
-            const encryptedSymmetricKey = new Uint8Array((atob(encryptedSymmetricKey_base64)).split(',').map((x) => parseInt(x)));
-            console.log("4. encryptedSymmetricKey: ", encryptedSymmetricKey);
-            await sleep(ms);
-
-            _log("5. Turn Unit8Array to Hex");
-            const encryptedSymmetricKey_hex =  buf2hex(encryptedSymmetricKey);
-            console.log("5. encryptedSymmetricKey_hex: ", encryptedSymmetricKey_hex);
-            await sleep(ms);
-
-            _log("6. Get decrypted symmetric key");
-            const decryptedSymmetricKey = await window.litNodeClient.getEncryptionKey({
-                accessControlConditions,
-                toDecrypt: encryptedSymmetricKey_hex,
-                chain,
-                authSig
-            });
-            console.log("6. decryptedSymmetricKey: ", decryptedSymmetricKey);
-            await sleep(ms);
-
-            _log("7. Get encryptedZip dataURI from localStorage");
-            const encryptedZip_dataUri = localStorage['encryptedZip'];
-            console.log("7. encryptedZip_dataUri: ", encryptedZip_dataUri);
-            await sleep(ms);
-
-            _log("8. Turn it into Blob object");
-            const encryptedZip_blob = dataURItoBlob(encryptedZip_dataUri);
-            console.log("8. encryptedZip_blob: ", encryptedZip_blob);
-            await sleep(ms);
-
-            _log("9. Get decrypted string");
-            const decryptedString = await getDecryptedString(encryptedZip_blob, decryptedSymmetricKey);
-            console.log("9. decryptedString: ", decryptedString);
-            await sleep(ms);
-
-            _log("10. Create resourceId");
-            const resourceId = {
-                baseUrl: 'iframe.videodelivery.net',
-                path: '/' + decryptedString, 
-                orgId: "",
-                role: "",
-                extraData: ""
-            }
-            console.log("10. resourceId: ", resourceId);
-            await sleep(ms);
-
-            _log("11. Get JWT");
-            const jwt = await litNodeClient.getSignedToken({
-                accessControlConditions,
-                chain,
-                authSig,
-                resourceId
-            });
-            console.log("11. JWT: ", jwt);
-            await sleep(ms);
-
-            _log("12. Verify JWT");
-            const { verified, header, payload } = await LitJsSdk.verifyJwt({jwt});
-            console.log("12. verified: ", verified);
-            console.log("12. payload: ", payload);
-            console.log("12. header: ", header);
-
-            const url = `https://${payload.baseUrl}${payload.path}`;
-            console.log(url);
-
+            document.getElementById('result_generateSnippet').innerText = `<div class="lit-video-wrapper">
+    <iframe 
+        src=""
+        class="lit-video"
+        allow="accelerometer; gyroscope; 
+        autoplay; encrypted-media; 
+        picture-in-picture;" 
+        allowfullscreen="true"
+        data-lit="${localStorage['data-lit']}">
+    </iframe>
+    <button class="btn-lit-video-unlock">Unlock</button>
+</div>`
 
         }
+
         
-        //
-        // request JWT from lit-protocol network
-        ///
-        async function requestJWT(){
-
-            const chain = 'ethereum';
-            const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
-            const accessControlConditions = [
-                {
-                    "contractAddress": LitJsSdk.LIT_CHAINS[chain].contractAddress,
-                    "standardContractType": "",
-                    "chain": chain,
-                    "method": "",
-                    "parameters": [
-                        ":userAddress"
-                    ],
-                    "returnValueTest": {
-                        "comparator": "=",
-                        "value": "0xdCA42aC41e79db20995a84DE2cE2368519bcB4d0"
-                    }
-                }
-            ];
-
-            window.jwt = await litNodeClient.getSignedToken({
-                accessControlConditions,
-                chain,
-                authSig,
-                resourceId: window.resourceId
-            });
-
-            console.warn("JWT from Lit-Protocol: ", window.jwt);
-        }
-
-        // 
-        // verify JWT (This should be done in the backend)
-        //
-        async function verifyJWT(){
-            console.log("resourceID", JSON.stringify(window.resourceId, null ,2));
-
-            const { verified, header, payload } = LitJsSdk.verifyJwt({jwt})
-
-            console.log(payload);
-        }
-
-
-        // -- cloudflare methods
-        //
-        // Request CloudFlare Video JWT
-        // curl \
-        // -H "X-Auth-Email: lightanson@protonmail.com" \
-        // -H "X-Auth-Key: 9e71cdc773da780e5059efe41ee0887d86b08" \
-        // https://api.cloudflare.com/client/v4/accounts/9b47beba2f167662ac16b81572ee529d/stream/e43e6ed536db175ffc00b8d0f1e7c92e/token
-        // @params { String } accountId - CloudFlare Account ID
-        // @params { String } videoId - CloudFlare Global API
-        //
-        async function requestCloudflareVideoJWT(accountId, videoId){
-
-            // -- prepare params
-            const email = localStorage['cf_username'];
-            const globalAPI = localStorage['cf_global_api'];
-            const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${videoId}/token`;
-
-            const signed_url_restrictions = {
-                //limit viewing for the next 12 hours
-                exp: Math.floor(Date.now() / 1000) + (12*60*60)
-            };
-
-            // -- prepare request header
-            const options = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Auth-Email': email,
-                    'X-Auth-Key': globalAPI,
-                },
-                body: JSON.stringify(signed_url_restrictions),
-            };
-            
-            // -- execute
-            const res = await fetch(url, options);
-            const result = await res.json();
-            const videoJWT = result.result.token;
-            
-            // -- return
-            console.warn("CloudFlare Video JWT Token: ", videoJWT);
-            return videoJWT;
-        }
-
-        //
-        // Request CloudFlare Video JWT
-        // curl \
-        // -H "X-Auth-Email: lightanson@protonmail.com" \
-        // -H "X-Auth-Key: 9e71cdc773da780e5059efe41ee0887d86b08" \
-        // https://api.cloudflare.com/client/v4/accounts/9b47beba2f167662ac16b81572ee529d/stream/e43e6ed536db175ffc00b8d0f1e7c92e/token
-        // @params { String } accountId - CloudFlare Account ID
-        // @params { String } videoId - CloudFlare Global API
-        //
-        async function requestCloudflareVideoJSON(accountId, videoId){
-
-            // -- prepare params
-            const email = localStorage['cf_username'];
-            const globalAPI = localStorage['cf_global_api'];
-            const url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${videoId}`;
-
-            // -- prepare request header
-            const options = {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Auth-Email': email,
-                    'X-Auth-Key': globalAPI,
-                },
-            };
-            
-            // -- execute
-            const res = await fetch(url, options);
-            const result = await res.json();
-            
-            // -- return
-            console.warn("CloudFlare Video JSON: ", JSON.stringify(result.result, null, 2));
-        }
-
-        // ----- Setter -----
-        function saveConfig(){
-            localStorage['cf_username'] = document.getElementById('cf_username').value;
-            localStorage['cf_global_api'] = document.getElementById('cf_global_api').value;
-            localStorage['cf_account_id'] = document.getElementById('cf_account_id').value;
-        }
-
-
         // ----- Helper -----
-        function buf2hex(buffer) {
-            // buffer is an ArrayBuffer
-            return [...new Uint8Array(buffer)]
-                .map((x) => x.toString(16).padStart(2, "0"))
-                .join("");
-        }
-
-        function dataURItoBlob(dataURI) {
-            // convert base64 to raw binary data held in a string
-            // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-            var byteString = atob(dataURI.split(',')[1]);
-
-            // separate out the mime component
-            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-
-            // write the bytes of the string to an ArrayBuffer
-            var ab = new ArrayBuffer(byteString.length);
-
-            // create a view into the buffer
-            var ia = new Uint8Array(ab);
-
-            // set the bytes of the buffer to the correct values
-            for (var i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-
-            // write the ArrayBuffer to a blob, and you're done
-            var blob = new Blob([ab], {type: mimeString});
-            return blob;
-
-        }
-
         // 
         // turn blob data to data URI
         // @param { Blob } blob 
@@ -820,21 +126,39 @@
                 reader.readAsDataURL(blob);
             });
         }
-
-        // idValue
-        function val(e){
-            return document.getElementById(e).value;
-        }
-
-        // get random video id
-        function getRandomId(){
-
-            return 'e43e6ed536db175ffc00b8d0f1e7c92e';
-            // return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        }
-
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+        
+        // 
+        // Open Access Controls model
+        //
+        function openShareModal() {
+            console.log("open share modal");
+            ACCM.ReactContentRenderer.render(
+            ACCM.ShareModal,
+            // props to be passed to the ShareModal component.  These are documented here: https://github.com/LIT-Protocol/lit-access-control-conditions-modal#props
+            {
+                sharingItems: [],
+                onAccessControlConditionsSelected: async function (accessControlConditions) {
+                    console.log(
+                        "accessControlConditions from ShareModal: ",
+                        accessControlConditions
+                    );
+                    localStorage['accessControlConditions'] = btoa(JSON.stringify(accessControlConditions));
+                    ACCM.ReactContentRenderer.unmount(document.getElementById("shareModal"));
+                    await encryptVideoId();
+                    await generateSnippet();
+                },
+                onClose: () => {
+                    console.log("close share modal"), ACCM.ReactContentRenderer.unmount(document.getElementById("shareModal"));
+                },
+                getSharingLink: function (sharingItem) {
+                    console.log("getSharingLink", sharingItem);
+                    return "";
+                },
+                showStep: "ableToAccess",
+            },
+            // target DOM node
+            document.getElementById("shareModal")
+            );
         }
 
         // ----- Main (Load Lit-Protocol SDK) -----
@@ -847,22 +171,14 @@
 
             // listen when the network is fully connected:
             document.addEventListener('lit-ready', async function (e) {
-                console.log('LIT network is ready')
-                setNetworkLoading(true);
+                console.log('🔥 LIT network is ready')
+                window.networkLoading = true;
             }, false);
         }
-
-        // ----- Mounted
-        (() => {
-            document.getElementById('cf_video_id').value = getRandomId();
-        })();
-
 
     </script>
 
     <script onload='litJsSdkLoaded()' src="https://jscdn.litgateway.com/index.web.js"></script>
-    
-    <!-- <script onload='litJsSdkLoaded()' src="./lit-js-sdk/build/index.web.js"></script> -->
-    
+    <script src="./lit-access-control-conditions-modal-vanilla-js/dist/index.js"></script>    
 </body>
 </html>
