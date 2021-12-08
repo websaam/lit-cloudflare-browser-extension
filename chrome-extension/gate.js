@@ -1,8 +1,7 @@
 async function setAccessControlConditions(){
 
     // -- prepare params
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: 'ethereum'});
-
+    await LitJsSdk.checkAndSignAuthMessage({chain: 'ethereum'});
     openShareModal();
 }
 

@@ -55,7 +55,7 @@ function setupLitEmbedContainerDom(){
 
     var btnGate = document.getElementById('btn-lit-gate-video');
     btnGate.addEventListener('click', (e) => {
-        tokenGate();
+        setAccessControlConditions();
     });
 
     // inject code snippet area
@@ -82,11 +82,6 @@ function injectShareModel(){
     var model = document.createElement('div');
     model.setAttribute('id', 'shareModal');
     document.body.prepend(model);
-}
-
-function tokenGate(){
-    console.log("Token Gate!");
-    setAccessControlConditions();
 }
 
 (async () => {
