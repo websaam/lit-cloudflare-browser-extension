@@ -3,22 +3,22 @@
     "name": "Lit-CloudFlare",
     "description" : "Lit-CloudFlare",
     "version" : "0.0.1",
-    "background": {"scripts": ["reload.js"]},
+    "background": {"scripts": ["js/reload.js"]},
     "content_scripts": [ {
         "matches": [
             "https://dash.cloudflare.com/", 
             "https://dash.cloudflare.com/*"
         ],
         "css": [
-            "style.css",
+            "style/style.css",
             "vendors/lit-access-control-conditions-modal-vanilla-js/main.css"
         ],
         "js": [
-            "utils.js",
+            "js/utils.js",
             "vendors/jscdn.litgateway.com/index.web.js",
             "vendors/lit-access-control-conditions-modal-vanilla-js/index.js",
-            "main.js",
-            "gate.js"
+            "js/gate.js",
+            "entry.js"
         ]
     } ],
     "icons": {"128": "icon.png"},
