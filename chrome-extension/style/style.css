@@ -12,5 +12,9 @@
 }
 #lit-snippet, #lit-js-snippet{
     margin-top: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 0px;
+}
+.lit-btn-copy {
+    color: #3D3D3D;
+    font-size: 12px;
 }

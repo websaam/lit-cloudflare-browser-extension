@@ -105,8 +105,10 @@ function setupLitEmbedContainerDom(){
     const template = `
         <div id="btn-lit-gate-video">🔥 Token-gate this video </div>
         <pre id="lit-snippet"></pre>
+        <span class="lit-btn-copy">Click to copy</span>
         <label>Place the following script tags at the end of the body tag</label>
         <pre id="lit-js-snippet"></pre>
+        <span class="lit-btn-copy">Click to copy</span>
     `
 
     const scriptSrc = 'https://files-ruddy-ten.vercel.app/';
@@ -124,6 +126,18 @@ function setupLitEmbedContainerDom(){
     var btnGate = document.getElementById('btn-lit-gate-video');
     btnGate.addEventListener('click', (e) => {
         setAccessControlConditions();
+    });
+
+    var btnsCopy = document.getElementsByClassName('lit-btn-copy');
+    [...btnsCopy].forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const snippet = btn.previousElementSibling.innerText;
+            navigator.clipboard.writeText(snippet).then(() => {
+            console.log('Async: Copying to clipboard was successful!');
+            }, (err) => {
+                console.error('Async: Could not copy text: ', err);
+            });
+        });
     });
 
     // -- add js script tags to snippet

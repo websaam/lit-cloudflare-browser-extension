@@ -1,0 +1,17 @@
+.lit-video-wrapper {
+    padding-top: calc(9% / 16 * 100);
+    position: relative;
+}
+
+.lit-video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.lit-video-wrapper button{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
