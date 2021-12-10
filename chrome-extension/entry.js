@@ -1,21 +1,47 @@
 // 
+// This file is the entry point of the browser extension
 // global variables:
 // - window.videoId
+// - window.embedContainerExist
 // - window.litNetworkReady
 //
 
+// ----------------------------- Entry -----------------------------
+(async () => {
+    console.log("🔥 Lit-Cloudflare Plugin 0.0.1");
+    
+    // connent to Lit Node Client
+    var litNodeClient = new LitJsSdk.LitNodeClient()
+    litNodeClient.connect()
+    window.litNodeClient = litNodeClient
+
+    // listen when the network is fully connected:
+    document.addEventListener('lit-ready', async function (e) {
+        window.litNetworkReady = true;
+        console.log('🔥 LIT network is ready');
+    }, false);
+
+    injectShareModalToBody();
+    
+    whileOnTheRightLink(() => {
+        console.log("Right Link");
+        manipulateDom();
+    }, () => {
+        console.log("Not in the link");
+        window.embedContainerExist = false;
+    }, 1000);
+})();
+
+// ----------------------------- Methods -----------------------------
 //
 // We are trying to find the video id under the label "Video ID"
 // @param { String } tag - a tag could be a div for <div>, label for <label>
 // @param { String } text - the text inside the tag eg. <label>this text</label>
-// @returns { Object } the found element
+// @returns { Array } an array of found elements
 //
-function getElementByTagText(tag, text){
-    var element;
-    [...document.querySelectorAll(tag)]
-       .filter(e => e.textContent.includes(text))
-       .forEach(e => element = e);
-    return element;
+function getElementsByTagText(tag, text){
+    return [...document.querySelectorAll(tag)]
+       .filter(e => e.textContent.includes(text));
 }
 
 // 
@@ -72,7 +98,7 @@ function setupLitEmbedContainerDom(){
     const scriptSrc = 'https://files-ruddy-ten.vercel.app/';
 
     // -- execute
-    window.addedEmbedContainer = true;
+    window.embedContainerExist = true;
     var tabPanel = document.querySelector('[role="tabpanel"]');
 
     var litEmbedContainer = document.createElement('div');
@@ -102,41 +128,34 @@ function injectShareModalToBody(){
     document.body.prepend(model);
 }
 
-// ---------- Entry ----------
-(async () => {
-    console.log("🔥 Lit-Cloudflare Plugin 0.0.1");
-    
-    // connent to Lit Node Client
-    var litNodeClient = new LitJsSdk.LitNodeClient()
-    litNodeClient.connect()
-    window.litNodeClient = litNodeClient
-
-    // listen when the network is fully connected:
-    document.addEventListener('lit-ready', async function (e) {
-        window.litNetworkReady = true;
-        console.log('🔥 LIT network is ready');
-    }, false);
-
-    injectShareModalToBody();
-    
-    var videoLabelExist = setInterval(() => {
-        var videoIdLabel = getElementByTagText('label', 'Video ID');
-        let videoId;
-
-        if(videoIdLabel != undefined){
-            videoId = videoIdLabel.nextElementSibling.querySelector('pre').innerText;
+function whileOnTheRightLink(callbackValid, callbackInvalid, interval){
+    setInterval(() => {
+        var currentPath = window.location.href;
+        var re = new RegExp("^https:\/\/dash.cloudflare.com\/[a-z0-9]*\/stream\/videos\/[a-z0-9]*$");
+        if (re.test(currentPath)) {
+            callbackValid();
+        } else {
+            callbackInvalid();
         }
+    }, interval);
+}
 
-        if(videoIdLabel != undefined && videoId.length > 1){
-            console.log("Found Video Label ID");
-            window.videoId = videoId;
-            console.log(window.videoId);
-            onClickedEmbedTab(async () => {
-                if(!window.addedEmbedContainer){
-                    setupLitEmbedContainerDom();
-                }
-            });
-            clearInterval(videoLabelExist);
-        }
-    }, 100);
-})();
+function manipulateDom(){
+    var videoIdLabel = getElementsByTagText('label', 'Video ID')[0];
+    let videoId;
+
+    if(videoIdLabel != undefined){
+        videoId = videoIdLabel.nextElementSibling.querySelector('pre').innerText;
+    }
+
+    if(videoIdLabel != undefined && videoId.length > 1){
+        console.log("Found Video Label ID");
+        window.videoId = videoId;
+        console.log(window.videoId);
+        onClickedEmbedTab(async () => {
+            if(!window.embedContainerExist){
+                setupLitEmbedContainerDom();
+            }
+        });
+    }
+}
