@@ -22,11 +22,10 @@ buf2hex = (buffer) => [...new Uint8Array(buffer)]
         .join("");
 
 // ----- unlock
-async function unlock(e){
+async function onClickedUnlock(e){
     var data = JSON.parse(atob(e.getAttribute('data-lit')));
 
     const accessControlConditions = JSON.parse(atob(data['accessControlConditions']));
-    // console.log(accessControlConditions)
     const encryptedZip = dataURItoBlob(data['encryptedZip']);
     const toDecrypt = buf2hex(new Uint8Array(atob(data['encryptedSymmetricKey']).split(',').map((x) => parseInt(x))));
     const chain = accessControlConditions[0].chain;
@@ -42,13 +41,37 @@ async function unlock(e){
     const decryptedFiles = await LitJsSdk.decryptZip(encryptedZip, decryptedSymmetricKey);
     const decryptedString = await decryptedFiles["string.txt"].async("text"); // video id
 
-    const url = `https://iframe.videodelivery.net/${decryptedString}`;
-    e.src = url;
+    if(decryptedString != null & decryptedString != ''){
+        console.log("Unlocked");
+        const url = `https://iframe.videodelivery.net/${decryptedString}`;
+        e.src = url;
+        e.parentElement.classList.add('active');
+    }
+
 }
 
 // mounted
 (() => {
-    [...document.getElementsByClassName('btn-lit-video-unlock')].forEach((btn) => {
-        btn.addEventListener('click', (e) => unlock(e.target.parentElement.querySelector('iframe')));
+    [...document.getElementsByClassName('lit-video-wrapper')].forEach((wrapper) => {
+        var iframe = wrapper.querySelector('iframe');
+        var btn = wrapper.querySelector('button');
+        var text = iframe.getAttribute('data-readable-conditions');
+        var description = document.createElement('div');
+        description.classList.add('lit-video-description');
+        var overlay = document.createElement('div');
+        overlay.classList.add('lit-video-overlay');
+
+        var info = document.createElement('span');
+        info.classList.add('lit-video-info');
+        info.innerText = text;
+        wrapper.insertBefore(overlay, iframe);
+        wrapper.appendChild(description);
+        description.appendChild(btn);
+        description.appendChild(info);
+
+        // btn.parentElement.append(wrapper);
+        // wrapper.innerHTML = btn;
+        btn.addEventListener('click', () => onClickedUnlock(iframe));
+        wrapper.addEventListener('click', () => onClickedUnlock(iframe));
     });
 })();
