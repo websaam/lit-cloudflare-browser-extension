@@ -9,7 +9,7 @@
 
 // ----------------------------- Entry -----------------------------
 (async () => {
-    console.log("🔥 Lit-Cloudflare Plugin 0.0.1");
+    console.log("🔥 Lit-Cloudflare Plugin 1.0.0");
     
     // connent to Lit Node Client
     var litNodeClient = new LitJsSdk.LitNodeClient()
@@ -111,7 +111,8 @@ function setupLitEmbedContainerDom(){
         <span class="lit-btn-copy">Click to copy</span>
     `
 
-    const scriptSrc = 'https://files-ruddy-ten.vercel.app/';
+    const scriptSrc = 'https://cloudflare-lit-protocol-integration.vercel.app/lit-unlock.min.js';
+    const styleSrc = 'https://cloudflare-lit-protocol-integration.vercel.app/lit-unlock.min.css';
 
     // -- execute
     window.embedContainerExist = true;
@@ -134,6 +135,13 @@ function setupLitEmbedContainerDom(){
             const snippet = btn.previousElementSibling.innerText;
             navigator.clipboard.writeText(snippet).then(() => {
             console.log('Async: Copying to clipboard was successful!');
+
+                btn.innerText = 'Copied text to clipboard';
+
+                setTimeout(() => {
+                    btn.innerText = 'Click to copy';
+                }, 2000);
+
             }, (err) => {
                 console.error('Async: Could not copy text: ', err);
             });
@@ -144,6 +152,7 @@ function setupLitEmbedContainerDom(){
     document.getElementById('lit-js-snippet').innerText = `
 <script onload="LitJsSdk.litJsSdkLoadedInALIT()" src="https://jscdn.litgateway.com/index.web.js"></script>
 <script src="${scriptSrc}"></script>
+<link rel="stylesheet" href="${styleSrc}"></link>
     `
 }
 

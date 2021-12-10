@@ -17,4 +17,5 @@
 .lit-btn-copy {
     color: #3D3D3D;
     font-size: 12px;
+    cursor: pointer;
 }
