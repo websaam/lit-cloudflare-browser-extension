@@ -94,7 +94,7 @@ async function generateSnippet(){
         data-readable-conditions="${localStorage['readableConditions']}"
         data-lit="${localStorage['data-lit']}">
     </iframe>
-    <button class="btn-lit-video-unlock">Unlock</button>
+    <button class="btn-lit-video-unlock">🔥  Unlock with Lit-Protocol</button>
 </div>`;
 
 }
