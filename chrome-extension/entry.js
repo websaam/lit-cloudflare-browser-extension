@@ -22,6 +22,16 @@
         console.log('🔥 LIT network is ready');
     }, false);
 
+    // upon leave the page
+    window.onbeforeunload = function () {
+        localStorage.removeItem('WEB3_CONNECT_CACHED_PROVIDER');
+        localStorage.removeItem('data-lit');
+        localStorage.removeItem('readableConditions');
+        localStorage.removeItem('walletconnect');
+        // localStorage.removeItem('lit-auth-signature');
+        // localStorage.removeItem('lit-comms-keypair');
+     }
+
     injectShareModalToBody();
     
     whileOnTheRightLink(() => {
