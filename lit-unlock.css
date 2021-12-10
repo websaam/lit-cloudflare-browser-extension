@@ -5,7 +5,7 @@
     gap: 12px;
 }
 .lit-video-wrapper {
-    padding-top: calc(9% / 16 * 100);
+    /* padding-top: calc(9% / 16 * 100); */
     position: relative;
     border: 1px solid #8159D9;
     display: flex;
@@ -15,6 +15,8 @@
     opacity: 0.93;
     border-radius: 4px;
     overflow: hidden;
+    max-width: 345px;
+    height: 195.5px;
 }
 .lit-video-wrapper:hover{
     box-shadow: 0px 0px 12px black;
