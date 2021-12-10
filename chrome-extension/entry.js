@@ -1,9 +1,14 @@
 // 
 // global variables:
 // - window.videoId
+// - window.litNetworkReady
+//
 
 //
 // We are trying to find the video id under the label "Video ID"
+// @param { String } tag - a tag could be a div for <div>, label for <label>
+// @param { String } text - the text inside the tag eg. <label>this text</label>
+// @returns { Object } the found element
 //
 function getElementByTagText(tag, text){
     var element;
@@ -15,30 +20,39 @@ function getElementByTagText(tag, text){
 
 // 
 // listen to the tabs Settings, Captions, Embed, JSON
+// @params { Function } callback - a function to pass in when the "Embed" button is clicked
 //
 function onClickedEmbedTab(callback){
     var tabBtns = document.querySelectorAll('[role="tab"]');
     [...tabBtns].forEach((btn) => {
-        if(btn.getAttribute('aria-controls') == 'embed'){
-            btn.innerText += ' (Powered Up by 🔥 LitProtocol)';
 
-            btn.addEventListener('click', (e) => {
+        const isEmbedBtn = btn.getAttribute('aria-controls') == 'embed';
+
+        // ammend the tab text if it's the embed tab
+        btn.innerText = isEmbedBtn ? 'Embed (Powered Up by 🔥 LitProtocol)' : btn.innerText;
+
+        // when a tab is clicked
+        btn.addEventListener('click', (e) => {
+
+            var container = document.getElementsByClassName('lit-embed-container');
+
+            // when is the embed tab
+            if(isEmbedBtn){
                 window.hidedEmbedContainer = false;
-                var container = document.getElementsByClassName('lit-embed-container');
                 if(container.length > 0){
                     container[0].style.display = 'unset';
                 }
                 callback();
-            });
-        }else{
-            btn.addEventListener('click', (e) => {
-                window.hidedEmbedContainer = true;
-                var container = document.getElementsByClassName('lit-embed-container');
-                if(container.length > 0){
-                    container[0].style.display = 'none';
-                }
-            });
-        }
+                return;
+            }
+
+            // when other tabs
+            window.hidedEmbedContainer = true;
+            if(container.length > 0){
+                container[0].style.display = 'none';
+            }
+        });
+
     });
 }
 
@@ -84,6 +98,7 @@ function injectShareModel(){
     document.body.prepend(model);
 }
 
+// ---------- Entry ----------
 (async () => {
     console.log("🔥 Lit-Cloudflare Plugin 0.0.1");
     
@@ -94,7 +109,8 @@ function injectShareModel(){
 
     // listen when the network is fully connected:
     document.addEventListener('lit-ready', async function (e) {
-        console.log('🔥 LIT network is ready')
+        window.litNetworkReady = true;
+        console.log('🔥 LIT network is ready');
     }, false);
 
     injectShareModel();
