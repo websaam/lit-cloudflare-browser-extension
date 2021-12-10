@@ -56,43 +56,47 @@ function onClickedEmbedTab(callback){
     });
 }
 
+//
+// Add the Lit section into the DOM
+// 
 function setupLitEmbedContainerDom(){
+
+    // -- prepare data
+    const template = `
+        <div id="btn-lit-gate-video">🔥 Token-gate this video </div>
+        <pre id="lit-snippet"></pre>
+        <label>Place the following script tags at the end of the body tag</label>
+        <pre id="lit-js-snippet"></pre>
+    `
+
+    const scriptSrc = 'https://files-ruddy-ten.vercel.app/';
+
+    // -- execute
     window.addedEmbedContainer = true;
     var tabPanel = document.querySelector('[role="tabpanel"]');
 
     var litEmbedContainer = document.createElement('div');
     litEmbedContainer.classList.add('lit-embed-container');
-    litEmbedContainer.innerHTML = `
-    <div id="btn-lit-gate-video">🔥 Token-gate this video </div>
-    `;
+    litEmbedContainer.innerHTML = template;
     tabPanel.prepend(litEmbedContainer);
 
+    // -- add listeners
     var btnGate = document.getElementById('btn-lit-gate-video');
     btnGate.addEventListener('click', (e) => {
         setAccessControlConditions();
     });
 
-    // inject code snippet area
-    var pre = document.createElement('pre');
-    pre.setAttribute('id', 'lit-snippet');
-    tabPanel.append(pre);
-
-    // inject js snippet description
-    var jsPreLabel = document.createElement('label');
-    jsPreLabel.innerText = 'Place the following script tags at the end of the body tag';
-    tabPanel.appendChild(jsPreLabel);
-
-    // inject script tab snippet here
-    var jsPre = document.createElement('pre');
-    jsPre.setAttribute('id', 'lit-js-snippet');
-    jsPre.innerText = `
-<script onload="LitJsSdk.litJsSdkLoadedInALIT()"src="https://jscdn.litgateway.com/index.web.js"></script>
-<script src="https://files-ruddy-ten.vercel.app/"></script>
-    `;
-    tabPanel.append(jsPre);
+    // -- add js script tags to snippet
+    document.getElementById('lit-js-snippet').innerText = `
+<script onload="LitJsSdk.litJsSdkLoadedInALIT()" src="https://jscdn.litgateway.com/index.web.js"></script>
+<script src="${scriptSrc}"></script>
+    `
 }
 
-function injectShareModel(){
+// 
+// Inject the accessControlConditions modal tag after the <body> tag
+//
+function injectShareModalToBody(){
     var model = document.createElement('div');
     model.setAttribute('id', 'shareModal');
     document.body.prepend(model);
@@ -113,7 +117,7 @@ function injectShareModel(){
         console.log('🔥 LIT network is ready');
     }, false);
 
-    injectShareModel();
+    injectShareModalToBody();
     
     var videoLabelExist = setInterval(() => {
         var videoIdLabel = getElementByTagText('label', 'Video ID');
