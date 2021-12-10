@@ -3,6 +3,7 @@
 // global variables:
 // - window.videoId
 // - window.embedContainerExist
+// - window.onLink
 // - window.litNetworkReady
 //
 
@@ -24,10 +25,10 @@
     injectShareModalToBody();
     
     whileOnTheRightLink(() => {
-        console.log("Right Link");
+        window.onLink = true;
         manipulateDom();
     }, () => {
-        console.log("Not in the link");
+        window.onLink = false;
         window.embedContainerExist = false;
     }, 1000);
 })();
@@ -47,8 +48,10 @@ function getElementsByTagText(tag, text){
 // 
 // listen to the tabs Settings, Captions, Embed, JSON
 // @params { Function } callback - a function to pass in when the "Embed" button is clicked
+// @returns { void }
 //
 function onClickedEmbedTab(callback){
+
     var tabBtns = document.querySelectorAll('[role="tab"]');
     [...tabBtns].forEach((btn) => {
 
@@ -84,6 +87,7 @@ function onClickedEmbedTab(callback){
 
 //
 // Add the Lit section into the DOM
+// @returns { void }
 // 
 function setupLitEmbedContainerDom(){
 
@@ -121,6 +125,7 @@ function setupLitEmbedContainerDom(){
 
 // 
 // Inject the accessControlConditions modal tag after the <body> tag
+// @returns { void }
 //
 function injectShareModalToBody(){
     var model = document.createElement('div');
@@ -128,6 +133,12 @@ function injectShareModalToBody(){
     document.body.prepend(model);
 }
 
+//
+// Check if we are on the right URL 
+// url has to match the following format
+// https://dash.cloudflare.com/.../stream/videos/...
+// @returns { void }
+//
 function whileOnTheRightLink(callbackValid, callbackInvalid, interval){
     setInterval(() => {
         var currentPath = window.location.href;
@@ -140,6 +151,11 @@ function whileOnTheRightLink(callbackValid, callbackInvalid, interval){
     }, interval);
 }
 
+//
+// Look for the video id and setup dom
+// when embed tab is clicked
+// @returns { void }
+//
 function manipulateDom(){
     var videoIdLabel = getElementsByTagText('label', 'Video ID')[0];
     let videoId;
@@ -153,7 +169,10 @@ function manipulateDom(){
         window.videoId = videoId;
         console.log(window.videoId);
         onClickedEmbedTab(async () => {
-            if(!window.embedContainerExist){
+
+            // If we are on the right link
+            // and when our container is not embeded yet
+            if(!window.embedContainerExist && window.onLink){
                 setupLitEmbedContainerDom();
             }
         });
