@@ -25,8 +25,8 @@ CloudFlare dashboard, without the need to go through third-party websites/apps.
 
 ![](https://assets.wzac.io/lit-protocol/lit-cloudflare-extension-instruction-2.png)
 
-# Demo
-[![Demo]({video-url](https://assets.wzac.io/lit-protocol/Lit-CloudFlare-Browser-Extension-Demo.mp4})]({[video-url](https://assets.wzac.io/lit-protocol/Lit-CloudFlare-Browser-Extension-Demo.mp4)} "Lit-CloudFlare Browser Extension")
+# Screenshot
+![](https://assets.wzac.io/lit-protocol/lit-cloudflare-extension-screenshot-1.png)
 
 # Current known limitations
 
