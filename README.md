@@ -25,6 +25,9 @@ CloudFlare dashboard, without the need to go through third-party websites/apps.
 
 ![](https://assets.wzac.io/lit-protocol/lit-cloudflare-extension-instruction-2.png)
 
+# Demo
+[![Demo]({video-url](https://assets.wzac.io/lit-protocol/Lit-CloudFlare-Browser-Extension-Demo.mp4})]({[video-url](https://assets.wzac.io/lit-protocol/Lit-CloudFlare-Browser-Extension-Demo.mp4)} "Lit-CloudFlare Browser Extension")
+
 # Current known limitations
 
 1. Only works on Brave browser due to built-in wallet support
