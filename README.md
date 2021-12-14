@@ -13,6 +13,18 @@ CloudFlare dashboard, without the need to go through third-party websites/apps.
 5. Copy snippets
 6. Paste it to anywhere you want.
 
+# Installation
+
+1. Git clone this repository
+
+2. Go to `brave://extensions` and click the `Load unpacked` button
+
+![](https://assets.wzac.io/lit-protocol/lit-cloudflare-extension-instruction-1.png)
+
+3. Select your folder
+
+![](https://assets.wzac.io/lit-protocol/lit-cloudflare-extension-instruction-2.png)
+
 # Current known limitations
 
 1. Only works on Brave browser due to built-in wallet support
