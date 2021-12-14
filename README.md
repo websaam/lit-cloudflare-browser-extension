@@ -1,8 +1,6 @@
 # Lit-CloudFlare plugin
 
-This plugin is created with the intention of eliminating the steps in which CloudFlare user 
-interacts with the lit-protocol. CloudFlare users would able to token-gate their videos right in the 
-CloudFlare dashboard, without the need to go through third-party websites/apps.
+This plugin is created to eliminate the steps in which CloudFlare user interacts with the Lit-protocol. CloudFlare users would be able to token-gate their videos right in the CloudFlare dashboard, without the need to go through third-party websites/apps.
 
 # User Journey
 
