@@ -50,6 +50,9 @@ function openShareModal() {
 async function encryptVideoId(){
                 
     // -- prepare params
+
+    const baseUrl = 'cf-worker.gtc-lightanson.workers.dev';
+
     const chain = 'ethereum';
 
     const authSig = await LitJsSdk.checkAndSignAuthMessage({chain: chain});
@@ -58,21 +61,26 @@ async function encryptVideoId(){
 
     const videoId = window.videoId;
 
-    const { encryptedZip, symmetricKey } = await LitJsSdk.zipAndEncryptString(videoId);
+    const resourceId = {
+        baseUrl,
+        path: `/${videoId}`,
+        orgId: "",
+        role: "",
+        extraData: ""
+    }
 
-    const encryptedSymmetricKey = await window.litNodeClient.saveEncryptionKey({
-        accessControlConditions, // array of objects [{}]
-        symmetricKey, // Unit8Array string
-        authSig, // object
-        chain, // string
-    });
+    await litNodeClient.saveSigningCondition({
+        accessControlConditions, 
+        chain, 
+        authSig, 
+        resourceId 
+    })
 
-    const encryptedZip_dataURI = await blobToDataURI(encryptedZip);
+    const resourceId_base64 = btoa(JSON.stringify(resourceId));
 
     localStorage['data-lit'] = btoa(JSON.stringify({
         accessControlConditions: localStorage['accessControlConditions'],
-        encryptedZip:  encryptedZip_dataURI,
-        encryptedSymmetricKey: btoa(encryptedSymmetricKey),
+        resourceId_base64
     }));
     localStorage.removeItem('accessControlConditions');    
 }

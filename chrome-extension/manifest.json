@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Lit-CloudFlare",
     "description" : "Lit-CloudFlare",
-    "version" : "1.0.0",
+    "version" : "1.0.1",
     "background": {"scripts": ["js/reload.js"]},
     "content_scripts": [ {
         "matches": [

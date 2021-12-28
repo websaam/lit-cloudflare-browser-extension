@@ -9,7 +9,7 @@
 
 // ----------------------------- Entry -----------------------------
 (async () => {
-    console.log("🔥 Lit-Cloudflare Plugin 1.0.0");
+    console.log("🔥 Lit-Cloudflare Plugin 1.0.1");
     
     // connent to Lit Node Client
     var litNodeClient = new LitJsSdk.LitNodeClient()
@@ -111,8 +111,8 @@ function setupLitEmbedContainerDom(){
         <span class="lit-btn-copy">Click to copy</span>
     `
 
-    const scriptSrc = 'https://cloudflare-lit-protocol-integration.vercel.app/lit-unlock.min.js';
-    const styleSrc = 'https://cloudflare-lit-protocol-integration.vercel.app/lit-unlock.min.css';
+    const scriptSrc = 'https://litcdn.wzac.io/0.0.1/lit-unlock.min.js';
+    const styleSrc = 'https://litcdn.wzac.io/0.0.1/lit-unlock.min.css';
 
     // -- execute
     window.embedContainerExist = true;
