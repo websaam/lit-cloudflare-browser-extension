@@ -3,7 +3,6 @@
     "name": "Lit-CloudFlare",
     "description" : "Lit-CloudFlare",
     "version" : "1.0.1",
-    "background": {"scripts": ["js/reload.js"]},
     "content_scripts": [ {
         "matches": [
             "https://dash.cloudflare.com/", 
