@@ -47,11 +47,12 @@ function openShareModal() {
     );
 }
 
+//
+// Select a video 
 async function encryptVideoId(){
                 
     // -- prepare params
-
-    const baseUrl = 'cf-worker.gtc-lightanson.workers.dev';
+    const baseUrl = localStorage['lit-base-resource'];
 
     const chain = 'ethereum';
 

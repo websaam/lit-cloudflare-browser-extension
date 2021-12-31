@@ -55,13 +55,33 @@ function getElementsByTagText(tag, text){
        .filter(e => e.textContent.includes(text));
 }
 
+//
+// Prompt user to enter their own server/resource URL to verify the JWT token
+// @param 
 // 
+function promptResourceUrl(){
+
+    let base_resource = prompt("Please enter your resource/server URL to verify the JWT token", "worker-name.username.workers.dev");
+    if(base_resource == null || base_resource == ""){
+        console.log("Prompt cancelled");
+    }else{
+        console.log(base_resource);
+        localStorage['lit-base-resource'] = base_resource.replace('http://', '').replace('https://', '');
+    }
+}
+
 // listen to the tabs Settings, Captions, Embed, JSON
 // @params { Function } callback - a function to pass in when the "Embed" button is clicked
 // @returns { void }
 //
 function onClickedEmbedTab(callback){
-
+    
+    // Check if user has entered their own server/resource url to verify the JWT token
+    if(localStorage['lit-base-resource'] == undefined){
+        promptResourceUrl();
+        return;
+    }
+    
     var tabBtns = document.querySelectorAll('[role="tab"]');
     [...tabBtns].forEach((btn) => {
 
@@ -77,6 +97,7 @@ function onClickedEmbedTab(callback){
 
             // when is the embed tab
             if(isEmbedBtn){
+
                 window.hidedEmbedContainer = false;
                 if(container.length > 0){
                     container[0].style.display = 'unset';
